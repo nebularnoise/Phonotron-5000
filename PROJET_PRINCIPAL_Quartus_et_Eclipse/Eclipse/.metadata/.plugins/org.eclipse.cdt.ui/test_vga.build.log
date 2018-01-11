@@ -1,0 +1,10 @@
+
+**** Build of configuration Nios II for project test_vga ****
+
+make all 
+Info: Building ../test_vga_bsp/
+make --no-print-directory -C ../test_vga_bsp/
+[BSP build complete]
+[test_vga build complete]
+
+**** Build Finished ****

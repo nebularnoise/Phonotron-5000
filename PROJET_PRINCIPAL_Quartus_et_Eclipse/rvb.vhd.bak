@@ -1,0 +1,47 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity rvb is
+	port(video: in std_logic;
+		  couleur: in std_logic_vector(2 downto 0);
+		  rouge, vert, bleu: out std_logic_vector(9 downto 0)
+		  );
+end rvb;
+
+architecture arch1 of rvb is
+
+begin
+
+	process(video,couleur)
+	
+	begin
+		
+		if(video='1')then
+			case couleur is
+				when "001" =>
+					rouge <= (others => '1');
+					vert <= (others => '1');
+					bleu <= (others => '1');
+				when "010" =>
+					rouge <= (others => '0');
+					vert <= (others => '1');
+					bleu <= (others => '0');
+				when "011" =>
+					rouge <= (others => '0');
+					vert <= (others => '0');
+					bleu <= (others => '1');
+				when others =>
+					rouge <= (others => '0');
+					vert <= (others => '0');
+					bleu <= (others => '0');
+			end case;
+			
+			else
+					rouge <= (others => '0');
+					vert <= (others => '0');
+					bleu <= (others => '0');
+			end if;
+			
+	end process;
+	
+end arch1;

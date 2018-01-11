@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<LOG_ROOT>
+	<PROJECT NAME="drum_machine">
+		<CBX_INST_ENTRY INSTANCE_NAME="|main_small|bpm:inst3|lpm_constant:LPM_CONSTANT_component" CBX_FILE_NAME="lpm_constant_4g6.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|main_small|clock_speed:inst13|lpm_constant:LPM_CONSTANT_component" CBX_FILE_NAME="lpm_constant_2u6.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|main_small|clock_speed:inst4|lpm_constant:LPM_CONSTANT_component" CBX_FILE_NAME="lpm_constant_2u6.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|main_small|dac_frequency:inst12|lpm_constant:LPM_CONSTANT_component" CBX_FILE_NAME="lpm_constant_6p6.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|main_small|sample_reader_hh:inst11|hh:hh1|altsyncram:altsyncram_component" CBX_FILE_NAME="altsyncram_ua71.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|main_small|sample_reader_kick:inst|kick:kick1|altsyncram:altsyncram_component" CBX_FILE_NAME="altsyncram_kh71.tdf"/>
+	</PROJECT>
+</LOG_ROOT>

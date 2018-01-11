@@ -1,0 +1,165 @@
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+
+entity top is
+port(
+	CLOCK_50 : in std_logic;
+	CLOCK_27 : in std_logic;
+	SRAM_ADDR : OUT STD_LOGIC_VECTOR (17 DOWNTO 0);
+	SRAM_DQ :INOUT STD_LOGIC_VECTOR (15 DOWNTO 0);
+	SRAM_WE_N : OUT STD_LOGIC;
+	SRAM_OE_N : OUT STD_LOGIC;
+	SRAM_UB_N : OUT STD_LOGIC;
+	SRAM_LB_N : OUT STD_LOGIC;
+	SRAM_CE_N : OUT STD_LOGIC;
+	AUD_BCLK : OUT STD_LOGIC;
+	AUD_DACDAT : OUT STD_LOGIC;
+	AUD_XCK : OUT STD_LOGIC;
+	AUD_DACLRCK : OUT STD_LOGIC;
+	I2C_SCLK :  OUT STD_LOGIC;
+	I2C_SDAT : INOUT STD_LOGIC;
+	SW : in std_logic_vector(3 downto 0);
+	KEY : in std_logic_vector(3 downto 0);
+	PS2_CLK : in std_logic;
+	PS2_DAT : in std_logic;
+	LEDG : OUT STD_LOGIC_VECTOR (8 DOWNTO 0)
+	);
+end entity;
+
+
+architecture A of top is
+
+component  ps2_keyboard IS
+  GENERIC(
+    clk_freq              : INTEGER := 100_000_000; --system clock frequency in Hz
+    pulse_shape_counter_size : INTEGER := 9);         --set such that (2^size)/clk_freq = 5us (size = 9 for 100MHz)
+  PORT(
+    clk          : IN  STD_LOGIC;                     --system clock
+    ps2_clk      : IN  STD_LOGIC;                     --clock signal from PS/2 keyboard
+    ps2_data     : IN  STD_LOGIC;                     --data signal from PS/2 keyboard
+    ps2_code_new : OUT STD_LOGIC;                     --flag that new PS/2 code is available on ps2_code bus
+    ps2_code     : OUT STD_LOGIC_VECTOR(7 DOWNTO 0)); --code received from PS/2
+END component;
+
+component audio_pll IS
+	PORT
+	(
+		inclk0		: IN STD_LOGIC  := '0';
+		c0		: OUT STD_LOGIC 
+	);
+END component;
+
+
+component system_pll IS
+	PORT
+	(
+		inclk0		: IN STD_LOGIC  := '0';
+		c0		: OUT STD_LOGIC 
+	);
+END component;
+
+component I2C_AV_Config 
+	port(
+		iCLK : IN std_logic;
+		iRST_N : IN std_logic;
+		I2C_SCLK : OUT std_logic;
+		I2C_SDAT : INOUT std_logic
+	);
+end component;
+
+	signal Clk_Audio_Dac : std_logic;
+	signal Clk_100 : std_logic;
+	
+	signal ps2_code_ok : std_logic;
+	signal ps2_code_ok_dly : std_logic;
+	signal ps2_code : STD_LOGIC_VECTOR(7 DOWNTO 0);
+	
+	
+component nios0 is
+	port (
+		clk_clk                                : in    std_logic                     := '0';             --                          clk.clk
+		reset_reset_n                          : in    std_logic                     := '0';             --                        reset.reset_n
+		sram_de2_0_conduit_end_0_ADDR          : out   std_logic_vector(17 downto 0);                    --     sram_de2_0_conduit_end_0.ADDR
+		sram_de2_0_conduit_end_0_DQ            : inout std_logic_vector(15 downto 0) := (others => '0'); --                             .DQ
+		sram_de2_0_conduit_end_0_WE_N          : out   std_logic;                                        --                             .WE_N
+		sram_de2_0_conduit_end_0_OE_N          : out   std_logic;                                        --                             .OE_N
+		sram_de2_0_conduit_end_0_UB_N          : out   std_logic;                                        --                             .UB_N
+		sram_de2_0_conduit_end_0_LB_N          : out   std_logic;                                        --                             .LB_N
+		sram_de2_0_conduit_end_0_CE_N          : out   std_logic;                                        --                             .CE_N
+		kb_data_external_connection_export     : in    std_logic_vector(7 downto 0)  := (others => '0'); --  kb_data_external_connection.export
+		kb_irq_external_connection_export      : in    std_logic                     := '0';             --   kb_irq_external_connection.export
+		audio_dac_fifo_0_conduit_end_oAUD_BCK  : out   std_logic;                                        -- audio_dac_fifo_0_conduit_end.oAUD_BCK
+		audio_dac_fifo_0_conduit_end_oAUD_LRCK : out   std_logic;                                        --                             .oAUD_LRCK
+		audio_dac_fifo_0_conduit_end_oAUD_DATA : out   std_logic;                                        --                             .oAUD_DATA
+		audio_dac_fifo_0_conduit_end_oAUD_XCK  : out   std_logic;                                        --                             .oAUD_XCK
+		audio_dac_fifo_0_conduit_end_iCLK_18_4 : in    std_logic                     := '0';             --                             .iCLK_18_4
+		sw_external_connection_export          : in    std_logic_vector(3 downto 0)  := (others => '0'); --       sw_external_connection.export
+		key_external_connection_export         : in    std_logic_vector(3 downto 0)  := (others => '0')  --      key_external_connection.export
+	);
+end component;
+	
+begin
+
+LEDG(8) <= '1';
+LEDG(7 downto 0) <= ps2_code;
+
+pll0 : audio_pll 
+	PORT MAP
+	(
+		inclk0 => CLOCK_27,
+		c0 =>  Clk_Audio_Dac
+	);
+
+pll1 : system_pll 
+	PORT MAP
+	(
+		inclk0 => CLOCK_50,
+		c0 =>  clk_100
+	);
+
+	
+KBInst : ps2_keyboard 
+  PORT MAP(
+    clk => clk_100,
+    ps2_clk  =>  PS2_CLK ,
+    ps2_data  =>  PS2_DAT ,
+    ps2_code_new => ps2_code_ok  ,
+    ps2_code  =>  ps2_code
+	 );
+
+
+I2CInst:I2C_AV_Config 
+	port map(
+		iCLK => clk_100,
+		iRST_N => '1',
+		I2C_SCLK  => I2C_SCLK,
+		I2C_SDAT  => I2C_SDAT
+	);
+	
+Nios0_inst : nios0 
+	port map (
+		clk_clk  => Clk_100,
+		reset_reset_n  => '1',
+		sram_de2_0_conduit_end_0_ADDR  => SRAM_ADDR,
+		sram_de2_0_conduit_end_0_DQ  => SRAM_DQ,
+		sram_de2_0_conduit_end_0_WE_N => SRAM_WE_N,
+		sram_de2_0_conduit_end_0_OE_N  => SRAM_OE_N,
+		sram_de2_0_conduit_end_0_UB_N  => SRAM_UB_N ,
+		sram_de2_0_conduit_end_0_LB_N => SRAM_LB_N,
+		sram_de2_0_conduit_end_0_CE_N => SRAM_CE_N,
+		kb_data_external_connection_export => ps2_code,
+		kb_irq_external_connection_export => ps2_code_ok,
+		audio_dac_fifo_0_conduit_end_oAUD_BCK  => AUD_BCLK,
+		audio_dac_fifo_0_conduit_end_oAUD_LRCK => AUD_DACLRCK,
+		audio_dac_fifo_0_conduit_end_oAUD_DATA => AUD_DACDAT,
+		audio_dac_fifo_0_conduit_end_oAUD_XCK  => AUD_XCK,
+		audio_dac_fifo_0_conduit_end_iCLK_18_4 => Clk_Audio_Dac,
+		sw_external_connection_export => SW,
+		key_external_connection_export => KEY
+
+	);
+
+end A;

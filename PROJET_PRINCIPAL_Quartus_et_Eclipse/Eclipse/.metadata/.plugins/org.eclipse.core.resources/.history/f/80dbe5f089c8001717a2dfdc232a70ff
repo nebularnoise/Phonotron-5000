@@ -1,0 +1,559 @@
+#include <stdio.h>
+#include "io.h"
+#include "system.h"
+#include "alt_types.h"
+#include "sys/alt_irq.h"
+#include "sys/alt_timestamp.h"
+#include <math.h>
+#include <stdbool.h>
+#include "kick.h"
+#include "clap.h"
+#include "snare.h"
+#include "hh.h"
+
+//////////////////////////////////////////////////
+//		Structs
+//////////////////////////////////////////////////
+struct Pixel{
+	int x;
+	int y;
+	int value;
+};
+
+//////////////////////////////////////////////////
+//		GLOBAL VARS
+//////////////////////////////////////////////////
+
+#define WIDTH 320
+#define HEIGHT 240
+#define DEBUG 1
+#define MIRE 0
+#define L_SHEET 32
+#define N_INST 4
+#define L_KICK 8572
+int ledNumber;
+int sheet[N_INST][L_SHEET]={{0}};
+struct Pixel isSelected;
+int readNext = 0;
+
+
+int current_kick_sample=0;
+int current_clap_sample=0;
+int current_snare_sample=0;
+int current_hh_sample=0;
+
+int kick_is_playing = 0;
+int clap_is_playing = 0;
+int snare_is_playing = 0;
+int hh_is_playing = 0;
+
+
+//////////////////////////////////////////////////
+//		Functions
+//////////////////////////////////////////////////
+
+// Hardware functions
+static void init();
+static void enableWrite();
+static void disableWrite();
+static void write(unsigned long address, int colour);
+static struct Pixel readInput();
+static unsigned long makeAddress(int x, int y);
+static void sheets_output();
+static void handle_KEYBOARD_interrupt(void* context, alt_u32 id);
+static void handle_DAC_interrupt(void* context, alt_u32 id);
+
+static void handle_KICK_interrupt(void* context, alt_u32 id);
+static void handle_SNARE_interrupt(void* context, alt_u32 id);
+static void handle_CLAP_interrupt(void* context, alt_u32 id);
+static void handle_HH_interrupt(void* context, alt_u32 id);
+
+
+
+
+
+
+// Drawing functions
+static void cleanScreen();
+static void drawMire();
+static void drawHLine(int x, int y, int length, int colour);
+static void drawVLine(int x, int y, int length, int colour);
+static void drawEmptySquare(int x, int y, int length, int colour);
+static void drawEmptySquareRow(int x, int y, int length, int spacing, int N, int colour);
+static void drawOneSheet(int y);
+static void drawSheets();
+
+// Process functions
+static void setActive();
+static void reset_sheets();
+static void move(int x, int y);
+unsigned long vectorCast32Bits(int n_inst);
+
+
+int main()
+{
+  printf("[INFO] Nios II started successfully\n");
+  cleanScreen(); // All values to zero
+  printf("[INFO] Screen cleared\n");
+  init();
+  printf("[INFO] Init. done\n");
+
+
+
+  if(MIRE) // Dessine une mire pour le test
+  {
+	  drawMire(); // S'il te plait, dessine moi un mouton...
+  }
+
+  drawSheets();
+
+  while(1)
+  {
+	  int sample = 0;
+	  if(kick_is_playing == 1 ){
+		  if(current_kick_sample<sizeof(kick)){
+			  sample += (int) ((256./2)*(kick[current_kick_sample]+1));
+			  current_kick_sample += 1;
+		  }else{
+			  current_kick_sample = 0;
+			  kick_is_playing = 0;
+		  }
+	  }
+	  if(snare_is_playing == 1){
+		  if(current_snare_sample<sizeof(snare)){
+			  sample += (int) ((256./2)*(snare[current_snare_sample]+1));
+			  current_snare_sample += 1;
+		  }else{
+			  current_snare_sample = 0;
+			  snare_is_playing = 0;
+		  }
+	  }
+	  if(clap_is_playing == 1){
+		  if(current_clap_sample<sizeof(clap)){
+			  sample += (int) ((256./2)*(clap[current_clap_sample]+1));
+			  current_clap_sample += 1;
+		  }else{
+			  current_clap_sample = 0;
+			  clap_is_playing = 0;
+		  }
+	  }
+	  if(hh_is_playing == 1){
+		  if(current_hh_sample<sizeof(hh)){
+			  sample += (int) ((256./2)*(hh[current_hh_sample]+1));
+			  current_hh_sample += 1;
+		  }else{
+			  current_hh_sample = 0;
+			  hh_is_playing = 0;
+		  }
+	  }
+
+	  while (IORD(AUDIO_DAC_FIFO_0_BASE,0))
+	  {
+	  }
+	  IOWR_16DIRECT(AUDIO_DAC_FIFO_0_BASE,0,sample);
+	  // écriture de l’échantillon de voie droite
+	  while (IORD(AUDIO_DAC_FIFO_0_BASE,0))
+	  {
+	  }
+	  IOWR_16DIRECT(AUDIO_DAC_FIFO_0_BASE,0,sample);
+
+  }
+
+  return 0;
+}
+
+unsigned long vectorCast32Bits(int n_inst)
+{
+	unsigned long castedSheet = 0;
+	int i;
+
+	for(i=0;i<L_SHEET;i++)
+	{
+		castedSheet += sheet[n_inst][i]*pow(2,i);
+		// Ou bien (suivant l'emplacement du bit de poids fort) :
+		// castedSheet += sheet[n_inst][i]*pow(2,L_SHEET-1-i);
+	}
+
+	if(DEBUG)
+	{
+		printf("[DEBUG] vectorCast32Bits, inst %d : %lu\n", n_inst, castedSheet);
+	}
+
+	return castedSheet;
+}
+
+static void sheets_output()
+{
+	IOWR_32DIRECT(SEQ_KICK_BASE,0,vectorCast32Bits(0));
+	IOWR_32DIRECT(SEQ_SNARE_BASE,0,vectorCast32Bits(1));
+	IOWR_32DIRECT(SEQ_HH_BASE,0,vectorCast32Bits(2));
+	IOWR_32DIRECT(SEQ_CLAP_BASE,0,vectorCast32Bits(3));
+}
+
+static void drawOneSheet(int y)
+{
+	int i;
+
+	drawEmptySquareRow(0,y,8,2,32,1); //32 empty white square
+	for(i=0;i<8;i++)
+	{
+		drawVLine(i*4*10+4,y+10,5,3);
+	}
+}
+
+static void drawSheets(){
+
+	int i;
+
+	for(i=0;i<N_INST;i++)
+	{
+		drawOneSheet(i*50 +5);
+	}
+}
+
+static void init(){
+	//////////////////////////////////////////////////
+	//		VARIABLES
+	//////////////////////////////////////////////////
+
+	isSelected.x = 0;
+	isSelected.y = 0;
+	move(0,0);
+
+	//////////////////////////////////////////////////
+	//		INTERRUPTIONS
+	//////////////////////////////////////////////////
+
+	/* 1. Reset the edge capture register. */
+	IOWR(KB_IRQ_BASE,3,15);
+	IOWR(DAC_IRQ_BASE,3,1);
+
+	IOWR(KICK_IRQ_BASE,3,1);
+	IOWR(SNARE_IRQ_BASE,3,1);
+	IOWR(CLAP_IRQ_BASE,3,1);
+	IOWR(HH_IRQ_BASE,3,1);
+
+	/* 2. Setup handling*/
+	printf("[INFO] init, KB_IRQ register returns: %i\n", alt_irq_register(KB_IRQ_IRQ,NULL,handle_KEYBOARD_interrupt));
+	printf("[INFO] init, DAC_IRQ register returns: %i\n", alt_irq_register(DAC_IRQ_IRQ,NULL,handle_DAC_interrupt));
+
+	printf("[INFO] init, KICK_IRQ register returns: %i\n", 	alt_irq_register(KICK_IRQ_IRQ,NULL,		handle_KICK_interrupt));
+	printf("[INFO] init, SNARE_IRQ register returns: %i\n", alt_irq_register(SNARE_IRQ_IRQ,NULL,	handle_SNARE_interrupt));
+	printf("[INFO] init, CLAP_IRQ register returns: %i\n", 	alt_irq_register(CLAP_IRQ_IRQ,NULL,		handle_CLAP_interrupt));
+	printf("[INFO] init, HH_IRQ register returns: %i\n", 	alt_irq_register(HH_IRQ_IRQ,NULL,		handle_HH_interrupt));
+	/* 3. Enable interrupt */
+	IOWR(KB_IRQ_BASE,2,15);
+	IOWR(DAC_IRQ_BASE,2,1);
+	IOWR(KICK_IRQ_BASE,2,1);
+	IOWR(SNARE_IRQ_BASE,2,1);
+	IOWR(CLAP_IRQ_BASE,2,1);
+	IOWR(HH_IRQ_BASE,2,1);
+
+}
+
+static void handle_DAC_interrupt(void* context, alt_u32 id){
+/*
+	int cur_ech = 0;
+
+	// Si on a pas fini de lire le sample
+	if(current_kick_sample<L_KICK)
+	{
+		// On lit un echantillon de plus
+		cur_ech = floor((kick[current_kick_sample]+1)*pow(2,7) - 1);
+		//printf("[DEBUG] sample %d : %d\n", current_kick_sample, cur_ech);
+
+		// TODO : trouver pourquoi les whiles ne se terminent jamais
+		while (IORD(AUDIO_DAC_FIFO_0_BASE,0))
+		{
+		}
+		IOWR_16DIRECT(AUDIO_DAC_FIFO_0_BASE,0,cur_ech);
+		// écriture de l’échantillon de voie droite
+		while (IORD(AUDIO_DAC_FIFO_0_BASE,0))
+		{
+		}
+		IOWR_16DIRECT(AUDIO_DAC_FIFO_0_BASE,0,cur_ech);
+
+		current_kick_sample += 1;
+	}
+
+
+	IOWR(DAC_IRQ_BASE,3,1);
+	*/
+}
+
+static void handle_KEYBOARD_interrupt(void* context, alt_u32 id){
+	int code = (int) IORD(KB_DATA_BASE,0);
+	if(DEBUG)
+	{
+		printf("[DEBUG] code : %d\n", code);
+	}
+
+	if(code == 240)
+	{
+		readNext = 1;
+	}
+	else if(readNext)
+	{
+		switch(code)
+		{
+		case 117: // haut
+			move(0,-1);
+			break;
+		case 107: // gauche
+			move(-1,0);
+			break;
+		case 116: // droite
+			move(1,0);
+			break;
+		case 114: // bas
+			move(0,1);
+			break;
+		case 90: // 'enter'
+			setActive();
+			break;
+		case 102: // 'backspace'
+			reset_sheets();
+			break;
+		case 66: // 'k'
+			current_kick_sample = 0;
+			break;
+		default:
+			break;
+		}
+		readNext = 0;
+	}
+
+	IOWR(KB_IRQ_BASE,3,15);
+}
+
+static void setActive()
+{
+	int colorToDraw=1;
+
+	if(sheet[isSelected.y][isSelected.x] == 0)
+	{
+		sheet[isSelected.y][isSelected.x] = 1;
+		colorToDraw = 3;
+	}
+	else
+	{
+		sheet[isSelected.y][isSelected.x] = 0;
+	}
+
+	drawEmptySquare(isSelected.x*10,isSelected.y*50+5, 8, colorToDraw);
+	sheets_output();
+
+	// Visualisation des partitions
+	if(DEBUG)
+	{
+		printf("[DEBUG] In setActive, sheet : \n\n");
+		int i,j;
+		for(i=0;i<N_INST;i++)
+		{
+			printf("[");
+			for(j=0;j<L_SHEET;j++)
+			{
+				printf(" %d ", sheet[i][j]);
+			}
+			printf("]\n");
+		}
+		printf("\n");
+	}
+}
+
+static void reset_sheets(){
+
+	int i, j;
+	for(i=0;i<N_INST;i++)
+	{
+		for(j=0;j<L_SHEET;j++)
+		{
+			sheet[i][j] = 0;
+		}
+	}
+	sheets_output();
+	cleanScreen();
+	drawSheets();
+	isSelected.x = 0;
+	isSelected.y =0;
+	move(0,0);
+
+}
+
+static void drawEmptySquareRow(int x, int y, int length, int spacing, int N, int colour){
+
+	int currentX = x;
+
+	int i=0;
+	for(i=0; i<N; i++){
+		drawEmptySquare(currentX, y, length, colour);
+		currentX = currentX + length + spacing;
+	}
+}
+
+static void drawHLine(int x, int y, int length, int colour){
+	int i=0;
+	for (i=0; i<length; i++){
+		write(makeAddress(x+i,y),colour);
+	}
+}
+
+static void move(int x, int y)
+{
+	// On efface l'activation precedente
+	drawEmptySquare(isSelected.x*10+3,isSelected.y*50+1,2,0);
+
+	isSelected.x += x;
+	isSelected.y += y;
+
+	// On evite les depassements hors grille
+	if(isSelected.x < 0)
+	{
+		isSelected.x = 0;
+	}
+	else if(isSelected.x > L_SHEET-1)
+	{
+		isSelected.x = L_SHEET-1;
+	}
+	if(isSelected.y < 0)
+	{
+		isSelected.y = 0;
+	}
+	else if(isSelected.y > N_INST-1)
+	{
+		isSelected.y = N_INST-1;
+	}
+
+	// On active la nouvelle position
+	drawEmptySquare(isSelected.x*10+3,isSelected.y*50+1,2,3);
+}
+
+static void drawVLine(int x, int y, int length, int colour){
+	int i=0;
+	for (i=0;i<length;i++){
+		write(makeAddress(x,y+i),colour);
+	}
+}
+
+static void cleanScreen(){
+	int allPixels = 131072;
+	int a = 0;
+	for(a=0; a<= allPixels; a++){
+		write((unsigned long) a, 0);
+	}
+}
+
+static void drawEmptySquare(int x, int y, int length, int colour){
+	drawHLine(x, 		y, 			length,		colour);
+	drawHLine(x, 		y+length, 	length,		colour);
+	drawVLine(x, 		y, 			length,		colour);
+	drawVLine(x+length, y, 			length+1,	colour);
+}
+
+static void enableWrite(){
+	IOWR(WR_EN_BASE,0,1);
+}
+
+static void disableWrite(){
+	IOWR(WR_EN_BASE,0,0);
+}
+
+static void write(unsigned long address, int colour){
+
+	if(colour>3 || colour<0)
+	{
+		printf("\t[ERROR] In write : colour = %d, set to 3.\n",colour);
+		colour = 3;
+	}
+
+	disableWrite();
+	IOWR(WR_ADDRESS_BASE,0,address);
+	IOWR(COLOR_OUT_BASE,0,colour);
+	enableWrite();
+	disableWrite();
+}
+
+static struct Pixel readInput(){
+	// TODO : a supprimer, probablement useless
+	// Read the input address bus Adr_lig[9..0], Adr_col[9..0]
+	// and write it in the x, and y variable of a pixel which is returned.
+
+	unsigned long rawInput = IORD(IN_BUS_BASE, 0);
+
+	unsigned long lowSelectionInt = 511; // 0000000000111111111;
+	int addrLig = rawInput >> 10;
+	int addrCol = rawInput & lowSelectionInt;
+
+	struct Pixel pixel;
+	pixel.x = addrCol;
+	pixel.y = addrLig;
+
+	return pixel;
+}
+
+static unsigned long makeAddress(int x, int y){
+
+
+	if(x >= WIDTH || y >= HEIGHT)
+	{
+		printf("\t[ERROR] In MakeAddress X = %d, Y = %d\n",x, y);
+		x = WIDTH-1;
+		y = HEIGHT-1;
+	}
+
+	unsigned long address = (((unsigned long)y) << 9) + ((unsigned long)x);
+
+//	if(DEBUG)
+//	{
+//		printf("[DEBUG] makeAdress(%d, %d) : %lu\n", x, y, address);
+//	}
+
+	return address;
+}
+
+static void drawMire()
+{
+	int i;
+	for(i=0;i<32;i++)
+	{
+	  drawHLine(0,2*i,10*i,3);
+	}
+
+	for(i=0;i<24;i++)
+	{
+	drawVLine(2*i,0,10*i,3);
+	}
+
+	drawHLine(0,0,10,1);
+	drawVLine(0,0,10,1);
+	drawHLine(0,64,320,1);
+	drawVLine(48,0,240,1);
+	drawEmptySquare(220, 180, 16,3);
+}
+
+
+static void handle_KICK_interrupt(void* context, alt_u32 id){
+	current_kick_sample = 0;
+	kick_is_playing = 1;
+	IOWR(KICK_IRQ_BASE,3,1);
+}
+static void handle_SNARE_interrupt(void* context, alt_u32 id){
+	current_snare_sample = 0;
+	snare_is_playing = 1;
+	IOWR(SNARE_IRQ_BASE,3,1);
+}
+static void handle_CLAP_interrupt(void* context, alt_u32 id){
+	current_clap_sample = 0;
+	clap_is_playing = 1;
+	IOWR(CLAP_IRQ_BASE,3,1);
+}
+static void handle_HH_interrupt(void* context, alt_u32 id){
+	current_hh_sample = 0;
+	hh_is_playing = 1;
+	IOWR(HH_IRQ_BASE,3,1);
+}
+
+
+
+
+

@@ -1,0 +1,18 @@
+
+**** Build of configuration Nios II for project test_vga_nios ****
+
+make all 
+Info: Building ../test_vga_nios_bsp/
+make --no-print-directory -C ../test_vga_nios_bsp/
+[BSP build complete]
+Info: Compiling hello_world.c to obj/default/hello_world.o
+nios2-elf-gcc -xc -MP -MMD -c -I../test_vga_nios_bsp//HAL/inc -I../test_vga_nios_bsp/ -I../test_vga_nios_bsp//drivers/inc  -DSYSTEM_BUS_WIDTH=32 -pipe -D__hal__ -DALT_NO_INSTRUCTION_EMULATION -DALT_SINGLE_THREADED    -O0 -g -Wall   -EL -mno-hw-div -mhw-mul -mno-hw-mulx  -o obj/default/hello_world.o hello_world.c
+Assembler messages:
+Fatal error: can't create obj/default/hello_world.o: Permission denied
+make: *** [obj/default/hello_world.o] Error 3
+
+**** Build of configuration Nios II for project test_vga_nios ****
+
+Error: Command canceled
+
+**** Build Finished ****

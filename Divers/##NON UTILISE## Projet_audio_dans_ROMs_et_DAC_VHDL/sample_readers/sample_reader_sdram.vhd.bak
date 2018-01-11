@@ -1,0 +1,149 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use ieee.numeric_std.all;
+
+
+entity sample_reader_sdram is
+	port (
+		DAC_CLK: in std_logic;
+		PLAY: 		in std_logic_vector(3 downto 0); -- 4 instruments
+		
+		is_playing : out std_logic_vector(3 downto 0); -- 4 instruments
+		SAMPLE_0: out std_LOGIC_VECTOR(23 downto 0);
+		SAMPLE_1: out std_LOGIC_VECTOR(23 downto 0);
+		SAMPLE_2: out std_LOGIC_VECTOR(23 downto 0);
+		SAMPLE_3: out std_LOGIC_VECTOR(23 downto 0);
+		
+		
+		CLOCK_50: in std_logic;
+		--SDRAM signals
+		DRAM_ADDR: out std_LOGIC_VECTOR(11 downto 0) ;
+		DRAM_BA_0,DRAM_BA_1,DRAM_CAS_N,DRAM_CKE,DRAM_CLK,DRAM_CS_N: out std_logic;
+		DRAM_DQ: inout std_LOGIC_VECTOR(15 downto 0) ;
+		DRAM_LDQM,DRAM_UDQM,DRAM_RAS_N,DRAM_WE_N: out std_logic
+	);
+	
+	
+	constant SAMPLE_0_ADDRESS: STD_LOGIC_VECTOR(21 downto 0) := (others=> '0');
+	constant SAMPLE_1_ADDRESS: STD_LOGIC_VECTOR(21 downto 0) := (others=> '0');
+	constant SAMPLE_2_ADDRESS: STD_LOGIC_VECTOR(21 downto 0) := (others=> '0');
+	constant SAMPLE_3_ADDRESS: STD_LOGIC_VECTOR(21 downto 0) := (others=> '0');
+	
+	constant SAMPLE_0_SIZE:   integer := 7875;
+	constant SAMPLE_1_SIZE:   integer := 7875;
+	constant SAMPLE_2_SIZE:   integer := 7875;
+	constant SAMPLE_3_SIZE:   integer := 7875;
+	
+end sample_reader_sdram;
+
+
+architecture arch of sample_reader_sdram is
+	
+	component sdram_4ports
+		PORT
+		(
+			DAC_CLK: in std_logic;
+			CLOCK_50: in std_logic;
+		
+			ADDRESS_0: in 	STD_LOGIC_VECTOR(21 downto 0);
+			DATA_0:		out 	STD_LOGIC_VECTOR(23 downto 0);
+			ADDRESS_1: in 	STD_LOGIC_VECTOR(21 downto 0);
+			DATA_1:		out 	STD_LOGIC_VECTOR(23 downto 0);
+			ADDRESS_2: in 	STD_LOGIC_VECTOR(21 downto 0);
+			DATA_2:		out 	STD_LOGIC_VECTOR(23 downto 0);
+			ADDRESS_3: in 	STD_LOGIC_VECTOR(21 downto 0);
+			DATA_3:		out 	STD_LOGIC_VECTOR(23 downto 0);
+		);
+	END component;
+	
+		
+	signal current_sample_0_address 	: STD_LOGIC_VECTOR(21 downto 0) := (others=> '0');
+	signal current_sample_1_address 	: STD_LOGIC_VECTOR(21 downto 0) := (others=> '0');
+	signal current_sample_2_address 	: STD_LOGIC_VECTOR(21 downto 0) := (others=> '0');
+	signal current_sample_3_address 	: STD_LOGIC_VECTOR(21 downto 0) := (others=> '0');
+	
+	signal sample_0_data					: STD_LOGIC_VECTOR(23 downto 0) := (others=> '0');
+	signal sample_1_data					: STD_LOGIC_VECTOR(23 downto 0) := (others=> '0');
+	signal sample_2_data					: STD_LOGIC_VECTOR(23 downto 0) := (others=> '0');
+	signal sample_3_data					: STD_LOGIC_VECTOR(23 downto 0) := (others=> '0');
+
+	signal sample_is_playing				: std_logic_vector(3 downto 0);
+	
+	
+begin
+
+	sdram_4ports_inst : sdram_4ports 
+	port map (
+		DAC_CLK => DAC_CLK,
+		CLOCK_50 => CLOCK_50,
+		
+		ADDRESS_0 => current_sample_0_address,
+		ADDRESS_1 => current_sample_1_address,
+		ADDRESS_2 => current_sample_2_address,
+		ADDRESS_3 => current_sample_3_address,
+		
+		DATA_0 => sample_0_data,
+		DATA_1 => sample_1_data,
+		DATA_2 => sample_2_data,
+		DATA_3 => sample_3_data
+	);
+	 
+	 
+	 
+	 SAMPLE_0 	<= sample_0_data when internal_is_playing(0) = '1' else (others=>'0'); 
+	 SAMPLE_1 	<= sample_1_data when internal_is_playing(1) = '1' else (others=>'0'); 
+	 SAMPLE_2 	<= sample_2_data when internal_is_playing(2) = '1' else (others=>'0'); 
+	 SAMPLE_3 	<= sample_3_data when internal_is_playing(3) = '1' else (others=>'0'); 
+	 
+	 
+	 
+	 
+	 
+	 process(DAC_CLK, PLAY)
+		variable temp_address: unsigned (21 downto 0) := (others => '0');
+	begin
+	
+		sample_is_playing <= PLAY;
+		
+		if(DAC_CLK'event and DAC_CLK='1') then
+			if (sample_is_playing(0)='1') then
+				temp_address := (unsigned(current_sample_0_address) + 2);
+				current_sample_0_address <= std_logic_vector(temp_address);	
+			end if;
+			if (sample_is_playing(1)='1') then
+				temp_address := (unsigned(current_sample_1_address) + 2);
+				current_sample_1_address <= std_logic_vector(temp_address);	
+			end if;
+			if (sample_is_playing(2)='1') then
+				temp_address := (unsigned(current_sample_2_address) + 2);
+				current_sample_2_address <= std_logic_vector(temp_address);	
+			end if;
+			if (sample_is_playing(3)='1') then
+				temp_address := (unsigned(current_sample_3_address) + 2);
+				current_sample_3_address <= std_logic_vector(temp_address);	
+			end if;
+		end if;
+		
+		
+		-- stop playing at the end of the sample
+		if (to_integer(unsigned(current_sample_0_address)) > SAMPLE_0_SIZE) then
+			current_sample_0_address <= (others=> '0');
+			sample_is_playing(0) <= '0';
+		end if;
+		if (to_integer(unsigned(current_sample_1_address)) > SAMPLE_1_SIZE) then
+			current_sample_1_address <= (others=> '0');
+			sample_is_playing(1) <= '0';
+		end if;
+		if (to_integer(unsigned(current_sample_2_address)) > SAMPLE_2_SIZE) then
+			current_sample_2_address <= (others=> '0');
+			sample_is_playing(2) <= '0';
+		end if;
+		if (to_integer(unsigned(current_sample_3_address)) > SAMPLE_3_SIZE) then
+			current_sample_3_address <= (others=> '0');
+			sample_is_playing(3) <= '0';
+		end if;
+		
+		
+	end process;
+
+end arch;

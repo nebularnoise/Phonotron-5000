@@ -1,0 +1,10 @@
+
+**** Build of configuration Nios II for project Phonotron_5000 ****
+
+make all 
+Info: Building ../Phonotron_5000_bsp/
+make --no-print-directory -C ../Phonotron_5000_bsp/
+[BSP build complete]
+[Phonotron_5000 build complete]
+
+**** Build Finished ****

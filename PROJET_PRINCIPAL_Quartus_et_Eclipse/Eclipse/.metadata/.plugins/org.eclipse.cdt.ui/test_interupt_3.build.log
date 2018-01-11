@@ -1,0 +1,22 @@
+
+**** Build of configuration Nios II for project test_interupt_3 ****
+
+make all 
+Info: Building ../test_interupt_3_bsp/
+make --no-print-directory -C ../test_interupt_3_bsp/
+[BSP build complete]
+Info: Compiling hello_world.c to obj/default/hello_world.o
+nios2-elf-gcc -xc -MP -MMD -c -I../test_interupt_3_bsp//HAL/inc -I../test_interupt_3_bsp/ -I../test_interupt_3_bsp//drivers/inc  -DSYSTEM_BUS_WIDTH=32 -pipe -D__hal__ -DALT_NO_INSTRUCTION_EMULATION -DALT_SINGLE_THREADED    -O0 -g -Wall   -EL -mno-hw-div -mhw-mul -mno-hw-mulx  -o obj/default/hello_world.o hello_world.c
+In file included from hello_world.c:9:
+kick.h:8574:3: warning: no newline at end of file
+hello_world.c:338: warning: 'readInput' defined but not used
+Info: Linking test_interupt_3.elf
+nios2-elf-g++  -T'../test_interupt_3_bsp//linker.x' -msys-crt0='../test_interupt_3_bsp//obj/HAL/src/crt0.o' -msys-lib=hal_bsp -L../test_interupt_3_bsp/   -Wl,-Map=test_interupt_3.map   -O0 -g -Wall   -EL -mno-hw-div -mhw-mul -mno-hw-mulx  -o test_interupt_3.elf obj/default/hello_world.o -lm 
+nios2-elf-insert test_interupt_3.elf --thread_model hal --cpu_name nios2_qsys_0 --qsys true --simulation_enabled false --stderr_dev jtag_uart_0 --stdin_dev jtag_uart_0 --stdout_dev jtag_uart_0 --sopc_system_name nios_ii --quartus_project_dir "D:/dervieux/Projet_VGA_NIOS" --sopcinfo D:/dervieux/Projet_VGA_NIOS/nios_ii.sopcinfo
+Info: (test_interupt_3.elf) 104 KBytes program size (code + initialized data).
+Info:                       367 KBytes free for stack + heap.
+Info: Creating test_interupt_3.objdump
+nios2-elf-objdump --disassemble --syms --all-header --source test_interupt_3.elf >test_interupt_3.objdump
+[test_interupt_3 build complete]
+
+**** Build Finished ****

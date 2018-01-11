@@ -1,0 +1,551 @@
+// Gene ecriture
+
+static int write_letter(int x, int y, char lettre, int color){
+	switch(lettre){
+		case ' ':
+			return 7;
+		case 'A':
+			drawVLine(x+1,y+2,6,color);
+			drawVLine(x+6,y+2,6,color);
+			drawHLine(x+1,y+4,6,color);
+			drawHLine(x+3,y,2,color);
+			drawHLine(x+2,y+1,1,color);
+			drawHLine(x+5,y+1,1,color);
+			return 8;
+		case 'B':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+5,y+1,2,color);
+			drawVLine(x+5,y+4,3,color);
+			drawHLine(x+1,y,4,color);
+			drawHLine(x+1,y+3,4,color);
+			drawHLine(x+1,y+7,4,color);
+			return 7;
+		case 'C':
+			drawVLine(x+1,y+1,6,color);
+			drawHLine(x+2,y,4,color);
+			drawHLine(x+2,y+7,4,color);
+			drawHLine(x+6,y+1,1,color);
+			drawHLine(x+6,y+6,1,color);
+			return 8;
+		case 'D':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+6,y+2,4,color);
+			drawHLine(x+1,y,4,color);
+			drawHLine(x+1,y+7,4,color);
+			drawHLine(x+5,y+1,1,color);
+			drawHLine(x+5,y+6,1,color);
+			return 8;
+
+		case 'E':
+			drawVLine(x+1,y,8,color);
+			drawHLine(x+1,y,5,color);
+			drawHLine(x+1,y+3,4,color);
+			drawHLine(x+1,y+7,5,color);
+			return 7;
+
+		case 'F':
+			drawVLine(x+1,y,8,color);
+			drawHLine(x+1,y,5,color);
+			drawHLine(x+1,y+3,4,color);
+			return 7;
+
+		case 'G':
+			drawVLine(x+1,y+1,6,color);
+			drawVLine(x+6,y+4,3,color);
+			drawHLine(x+2,y,4,color);
+			drawHLine(x+2,y+7,4,color);
+			drawHLine(x+5,y+4,2,color);
+			return 8;
+
+		case 'H':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+6,y,8,color);
+			drawHLine(x+1,y+3,6,color);
+			return 8;
+
+		case 'I':
+			drawVLine(x+2,y,8,color);
+			drawHLine(x+1,y,3,color);
+			drawHLine(x+1,y+7,3,color);
+			return 5;
+
+		case 'J':
+			drawVLine(x+3,y,7,color);
+			drawHLine(x+2,y,3,color);
+			drawHLine(x+1,y+7,2,color);
+			drawHLine(x+1,y+6,1,color);
+			return 6;
+
+		case 'K':
+			drawVLine(x+1,y,8,color);
+			drawHLine(x+5,y,1,color);
+			drawHLine(x+4,y+1,1,color);
+			drawHLine(x+3,y+2,1,color);
+			drawHLine(x+1,y+3,2,color);
+			drawHLine(x+3,y+4,1,color);
+			drawHLine(x+4,y+5,1,color);
+			drawVLine(x+5,y+6,2,color);
+			return 7;
+
+		case 'L':
+			drawVLine(x+1,y,8,color);
+			drawHLine(x+1,y+7,5,color);
+			return 7;
+
+		case 'M':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+7,y,8,color);
+			drawVLine(x+4,y+4,2,color);
+			drawHLine(x+2,y+2,1,color);
+			drawHLine(x+3,y+3,1,color);
+			drawHLine(x+5,y+3,1,color);
+			drawHLine(x+6,y+2,1,color);
+			return 9;
+
+		case 'N':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+6,y,8,color);
+			drawHLine(x+2,y+2,1,color);
+			drawHLine(x+3,y+3,1,color);
+			drawHLine(x+4,y+4,1,color);
+			drawHLine(x+5,y+5,1,color);
+			return 8;
+
+		case 'O':
+			drawVLine(x+1,y+1,6,color);
+			drawVLine(x+6,y+1,6,color);
+			drawHLine(x+2,y,4,color);
+			drawHLine(x+2,y+7,4,color);
+			return 8;
+
+		case 'P':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+5,y+1,3,color);
+			drawHLine(x+1,y,4,color);
+			drawHLine(x+1,y+4,4,color);
+			return 7;
+
+		case 'Q':
+			drawVLine(x+1,y+1,6,color);
+			drawVLine(x+6,y+1,5,color);
+			drawHLine(x+2,y,4,color);
+			drawHLine(x+2,y+7,3,color);
+			drawHLine(x+6,y+7,1,color);
+			drawHLine(x+5,y+6,1,color);
+			return 8;
+
+		case 'R':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+5,y+1,2,color);
+			drawHLine(x+1,y,4,color);
+			drawHLine(x+1,y+3,4,color);
+			drawHLine(x+3,y+4,1,color);
+			drawHLine(x+4,y+5,1,color);
+			drawVLine(x+5,y+6,2,color);
+			return 7;
+
+		case 'S':
+			drawHLine(x+2,y,4,color);
+			drawHLine(x+2,y+3,2,color);
+			drawHLine(x+4,y+4,2,color);
+			drawHLine(x+2,y+7,4,color);
+			drawVLine(x+1,y+1,2,color);
+			drawVLine(x+1,y+5,2,color);
+			drawVLine(x+6,y+1,2,color);
+			drawVLine(x+6,y+5,2,color);
+			return 8;
+		case 'T':
+			drawHLine(x+1,y,7,color);
+			drawVLine (x+4,y,8,color);
+			return 9;
+
+		case 'U':
+			drawVLine(x+1,y,7,color);
+			drawVLine(x+6,y,7,color);
+			drawHLine(x+2,y+7,4,color);
+			return 8;
+
+		case 'V':
+			drawVLine(x+1,y,3,color);
+			drawVLine(x+7,y,3,color);
+			drawVLine(x+2,y+3,2,color);
+			drawVLine(x+6,y+3,2,color);
+			drawVLine(x+3,y+5,2,color);
+			drawVLine(x+5,y+5,2,color);
+			drawVLine(x+4,y+7,1,color);
+			return 9;
+
+		case 'W':
+			drawVLine(x+1,y,4,color);
+			drawVLine(x+9,y,4,color);
+			drawVLine(x+2,y+4,3,color);
+			drawVLine(x+8,y+4,3,color);
+			drawVLine(x+3,y+7,1,color);
+			drawVLine(x+4,y+5,2,color);
+			drawVLine(x+5,y+3,2,color);
+			drawVLine(x+6,y+5,2,color);
+			drawVLine(x+7,y+7,1,color);
+			return 11;
+
+		case 'X':
+			drawHLine(x+1,y,1,color);
+			drawHLine(x+2,y+1,1,color);
+			drawHLine(x+3,y+2,1,color);
+			drawHLine(x+4,y+3,1,color);
+			drawHLine(x+5,y+4,1,color);
+			drawHLine(x+6,y+5,1,color);
+			drawHLine(x+7,y+6,1,color);
+			drawHLine(x+8,y+7,1,color);
+			drawHLine(x+1,y+7,1,color);
+			drawHLine(x+2,y+6,1,color);
+			drawHLine(x+3,y+5,1,color);
+			drawHLine(x+4,y+4,1,color);
+			drawHLine(x+5,y+3,1,color);
+			drawHLine(x+6,y+2,1,color);
+			drawHLine(x+7,y+1,1,color);
+			drawHLine(x+8,y,1,color);
+			return 10;
+
+		case 'Y':
+			drawHLine(x+1,y,1,color);
+			drawHLine(x+2,y+1,1,color);
+			drawHLine(x+3,y+2,1,color);
+			drawHLine(x+4,y+3,1,color);
+			drawVLine(x+5,y+4,4,color);
+			drawHLine(x+9,y,1,color);
+			drawHLine(x+8,y+1,1,color);
+			drawHLine(x+7,y+2,1,color);
+			drawHLine(x+6,y+3,1,color);
+			return 11;
+
+		case 'Z':
+			drawHLine(x+1,y,6,color);
+			drawHLine(x+1,y+7,6,color);
+			drawHLine(x+6,y+1,1,color);
+			drawHLine(x+5,y+2,1,color);
+			drawHLine(x+4,y+3,1,color);
+			drawHLine(x+3,y+4,1,color);
+			drawHLine(x+2,y+5,1,color);
+			drawHLine(x+1,y+6,1,color);
+			return 8;
+
+		case 'a':
+			drawHLine(x+2,y+3,2,color);
+			drawHLine(x+2,y+7,2,color);
+			drawHLine(x+5,y+7,1,color);
+			drawVLine(x+1,y+4,3,color);
+			drawVLine(x+4,y+4,3,color);
+			return 7;
+
+		case 'b':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+4,y+4,3,color);
+			drawHLine(x+1,y+3,3,color);
+			drawHLine(x+1,y+7,3,color);
+			return 6;
+
+		case 'c':
+			drawVLine(x+1,y+4,3,color);
+			drawHLine(x+2,y+3,2,color);
+			drawHLine(x+2,y+7,2,color);
+			return 5;
+
+		case 'd':
+			drawVLine(x+4,y,8,color);
+			drawVLine(x+1,y+4,3,color);
+			drawHLine(x+2,y+3,2,color);
+			drawHLine(x+2,y+7,2,color);
+			return 6;
+
+		case 'e':
+			drawVLine(x+1,y+4,3,color);
+			drawVLine(x+4,y+4,2,color);
+			drawHLine(x+2,y+3,2,color);
+			drawHLine(x+2,y+5,3,color);
+			drawHLine(x+2,y+7,3,color);
+			return 6;
+
+		case 'f':
+			drawVLine(x+2,y+1,7,color);
+			drawVLine(x+4,y+1,2,color);
+			drawHLine(x+3,y,1,color);
+			drawHLine(x+1,y+4,3,color);
+			return 6;
+
+		case 'g':
+			drawVLine(x+1,y+4,3,color);
+			drawVLine(x+4,y+3,7,color);
+			drawHLine(x+2,y+3,3,color);
+			drawHLine(x+2,y+7,3,color);
+			drawHLine(x+1,y+9,1,color);
+			drawHLine(x+2,y+10,2,color);
+			return 6;
+
+		case 'h':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+4,y+4,4,color);
+			drawHLine(x+1,y+3,3,color);
+			return 6;
+
+		case 'i':
+			drawVLine(x+1,y+1,1,color);
+			drawVLine(x+1,y+3,5,color);
+			return 3;
+
+		case 'j':
+			drawVLine(x+4,y+3,7,color);
+			drawHLine(x+4,y+1,1,color);
+			drawHLine(x+1,y+9,1,color);
+			drawHLine(x+2,y+10,2,color);
+			return 6;
+
+		case 'k':
+			drawVLine(x+1,y,8,color);
+			drawVLine(x+4,y+2,1,color);
+			drawVLine(x+3,y+3,1,color);
+			drawVLine(x+2,y+4,2,color);
+			drawVLine(x+3,y+6,1,color);
+			drawVLine(x+4,y+7,1,color);
+			return 6;
+
+		case 'l':
+			drawVLine(x+1,y,7,color);
+			drawHLine(x+2,y+7,2,color);
+			drawHLine(x+4,y+6,1,color);
+			return 6;
+		case 'm':
+		drawVLine(x+1,y+3,5,color);
+		drawVLine(x+2,y+4,1,color);
+		drawVLine(x+3,y+3,1,color);
+		drawVLine(x+4,y+4,4,color);
+		drawVLine(x+5,y+4,1,color);
+		drawVLine(x+6,y+3,1,color);
+		drawVLine(x+7,y+4,4,color);
+		return 9;
+
+		case 'n':
+		drawVLine(x+1,y+3,5,color);
+		drawVLine(x+4,y+4,4,color);
+		drawHLine(x+1,y+3,3,color);
+		return 6;
+
+		case 'o':
+		drawVLine(x+1,y+4,3,color);
+		drawVLine(x+4,y+4,3,color);
+		drawHLine(x+2,y+3,2,color);
+		drawHLine(x+2,y+7,2,color);
+		return 6;
+
+		case 'p':
+		drawVLine(x+1,y+3,8,color);
+		drawVLine(x+4,y+4,3,color);
+		drawHLine(x+2,y+3,2,color);
+		drawHLine(x+2,y+7,2,color);
+		return 6;
+
+		case 'q':
+		drawVLine(x+1,y+4,3,color);
+		drawVLine(x+4,y+3,8,color);
+		drawHLine(x+2,y+3,2,color);
+		drawHLine(x+2,y+7,2,color);
+		return 6;
+
+		case 'r':
+		drawVLine(x+1,y+3,5,color);
+		drawVLine(x+2,y+4,1,color);
+		drawVLine(x+3,y+3,1,color);
+		drawVLine(x+4,y+4,1,color);
+		return 6;
+
+		case 's':
+		drawHLine(x+2,y+3,3,color);
+		drawHLine(x+1,y+4,1,color);
+		drawHLine(x+2,y+5,2,color);
+		drawHLine(x+4,y+6,1,color);
+		drawHLine(x+1,y+7,3,color);
+		return 6;
+
+		case 't':
+		drawVLine(x+2,y,7,color);
+		drawHLine(x+1,y+3,3,color);
+		drawHLine(x+3,y+7,2,color);
+		drawHLine(x+5,y+6,1,color);
+		return 7;
+
+		case 'u':
+		drawVLine(x+1,y+3,4,color);
+		drawVLine(x+4,y+3,5,color);
+		drawHLine(x+2,y+7,3,color);
+		return 6;
+
+		case 'v':
+		drawVLine(x+1,y+3,2,color);
+		drawVLine(x+2,y+5,2,color);
+		drawVLine(x+3,y+7,1,color);
+		drawVLine(x+4,y+5,2,color);
+		drawVLine(x+5,y+3,2,color);
+		return 7;
+
+		case 'w':
+		drawVLine(x+1,y+3,3,color);
+		drawVLine(x+2,y+6,2,color);
+		drawVLine(x+3,y+5,1,color);
+		drawVLine(x+4,y+6,2,color);
+		drawVLine(x+5,y+3,3,color);
+		return 7;
+
+		case 'x':
+		drawVLine(x+1,y+3,1,color);
+		drawVLine(x+2,y+4,1,color);
+		drawVLine(x+3,y+5,1,color);
+		drawVLine(x+4,y+6,1,color);
+		drawVLine(x+5,y+7,1,color);
+		drawVLine(x+1,y+7,1,color);
+		drawVLine(x+2,y+6,1,color);
+		drawVLine(x+4,y+4,1,color);
+		drawVLine(x+5,y+3,1,color);
+		return 7;
+
+		case 'y':
+		drawVLine(x+1,y+3,4,color);
+		drawVLine(x+4,y+3,7,color);
+		drawHLine(x+2,y+7,3,color);
+		drawHLine(x+1,y+9,1,color);
+		drawHLine(x+2,y+10,2,color);
+		return 6;
+
+		case 'z':
+			drawHLine(x+1,y+3,4,color);
+			drawHLine(x+1,y+7,4,color);
+			drawHLine(x+3,y+4,1,color);
+			drawHLine(x+2,y+5,1,color);
+			drawHLine(x+1,y+6,1,color);
+			return 6;
+
+		case '0':
+			drawVLine(x+1,y+2,5,color);
+			drawVLine(x+5,y+2,5,color);
+			drawHLine(x+2,y+1,3,color);
+			drawHLine(x+2,y+7,3,color);
+			drawHLine(x+2,y+3,1,color);
+			drawHLine(x+3,y+4,1,color);
+			drawHLine(x+4,y+5,1,color);
+			return 7;
+
+		case '1':
+			drawVLine(x+2,y+1,7,color);
+			drawVLine(x+1,y+2,1,color);;
+			drawHLine(x+1,y+7,3,color);
+			return 5;
+
+		case '2':
+			drawVLine(x+5,y+2,2,color);
+			drawVLine(x+1,y+2,1,color);
+			drawHLine(x+2,y+1,3,color);
+			drawHLine(x+1,y+7,5,color);
+			drawHLine(x+4,y+4,1,color);
+			drawHLine(x+3,y+5,1,color);
+			drawHLine(x+2,y+6,1,color);
+			return 7;
+
+		case '3':
+			drawVLine(x+5,y+2,2,color);
+			drawVLine(x+1,y+2,1,color);
+			drawHLine(x+2,y+1,3,color);
+			drawHLine(x+3,y+4,2,color);
+			drawVLine(x+5,y+5,2,color);
+			drawHLine(x+2,y+7,3,color);
+			drawHLine(x+1,y+6,1,color);
+			return 7;
+
+		case '4':
+			drawVLine(x+4,y+1,7,color);
+			drawHLine(x+1,y+5,5,color);
+			drawHLine(x+1,y+4,1,color);
+			drawHLine(x+2,y+3,1,color);
+			drawHLine(x+3,y+2,1,color);
+			return 7;
+
+		case '5':
+			drawVLine(x+1,y+1,4,color);
+			drawHLine(x+1,y+1,5,color);
+			drawHLine(x+1,y+4,4,color);
+			drawVLine(x+5,y+5,2,color);
+			drawHLine(x+2,y+7,3,color);
+			drawHLine(x+1,y+6,1,color);
+			return 7;
+
+		case '6':
+			drawVLine(x+1,y+2,5,color);
+			drawVLine(x+5,y+5,2,color);
+			drawHLine(x+2,y+1,3,color);
+			drawHLine(x+2,y+7,3,color);
+			drawHLine(x+2,y+4,3,color);
+			drawHLine(x+5,y+2,1,color);
+			return 7;
+
+		case '7':
+			drawVLine(x+2,y+5,3,color);
+			drawHLine(x+1,y+1,5,color);
+			drawHLine(x+5,y+2,1,color);
+			drawHLine(x+4,y+3,1,color);
+			drawHLine(x+3,y+4,1,color);
+			return 7;
+
+		case '8':
+			drawVLine(x+1,y+2,2,color);
+			drawVLine(x+1,y+5,2,color);
+			drawVLine(x+5,y+2,2,color);
+			drawVLine(x+5,y+5,2,color);
+			drawHLine(x+2,y+1,3,color);
+			drawHLine(x+2,y+4,3,color);
+			drawHLine(x+2,y+7,3,color);
+			return 7;
+
+		case '9':
+			drawVLine(x+1,y+2,2,color);
+			drawVLine(x+1,y+6,1,color);
+			drawVLine(x+5,y+2,5,color);
+			drawHLine(x+2,y+1,3,color);
+			drawHLine(x+2,y+4,3,color);
+			drawHLine(x+2,y+7,3,color);
+			return 7;
+
+		case '?':
+		drawHLine(x,y,100,color);
+		drawHLine(x,y+1,100,color);
+		drawHLine(x,y+2,100,color);
+		drawHLine(x,y+3,100,color);
+		drawHLine(x,y+4,100,color);
+		drawHLine(x,y+5,100,color);
+		drawHLine(x,y+6,100,color);
+		drawHLine(x,y+7,100,color);
+		drawHLine(x,y+8,100,color);
+		drawHLine(x,y+9,100,color);
+		drawHLine(x,y+10,100,color);
+		drawHLine(x,y+11,100,color);
+		drawHLine(x,y+12,100,color);
+		drawHLine(x,y+13,100,color);
+		drawHLine(x,y+14,100,color);
+		drawHLine(x,y+15,100,color);
+		drawHLine(x,y+16,100,color);
+		drawHLine(x,y+17,100,color);
+		drawHLine(x,y+18,100,color);
+		drawHLine(x,y+19,100,color);
+		drawHLine(x,y+20,100,color);
+		drawHLine(x,y+21,100,color);
+		return 100;
+
+		default:
+			return 0;
+			break;
+	}
+}
+
+static void write_message(int x, int y, char message[], int color){
+	int taille_mess = strlen(message);
+	int i = 0, offset = 0;
+	for(i = 0; i < taille_mess ; i++){
+		offset += write_letter(x + offset, y, message[i], color);
+	}
+}

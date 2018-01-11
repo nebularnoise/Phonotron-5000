@@ -1,0 +1,172 @@
+#include <stdio.h>
+#include <math.h>
+#include "io.h"
+#include <system.h>
+#include "alt_types.h"
+#include "sys/alt_timestamp.h"
+#include "sys/alt_irq.h"
+#define NB_NOTES 8
+#define F_ECH 8000
+#define PI 3.14159265
+#define NB_MOTIF 1
+
+// Structures utilisées
+struct Note
+{
+	float fsignal;
+	int nbechper;
+	int * ech;
+};
+
+// Variables globales
+static float freq_notes[NB_NOTES]={261.63,293.66,329.63,349.23,392.00,440.00,493.88,523.25};
+static struct Note gamme[NB_NOTES];
+float gain;
+float fech;
+int note_a_jouer;
+float volume = 1;
+
+// Prototypes de fonctions
+void gen_gamme();
+void gen_note(struct Note * note);
+void test_gen_note(int nb_note);
+void audio_play(int num_note);
+void test_play_note(int nb_note);
+static void handle_Keyboard_interrupt(void* context, alt_u32 id);
+
+int main()
+{
+	printf("Generation de la gamme...\n");
+	gen_gamme();
+	printf("Gamme generee avec succes !\n");
+
+	// Initialisation des interruptions du clavier
+	/* Reset the edge capture register. */
+	IOWR(KB_IRQ_BASE,3,15);
+	alt_irq_register( KB_IRQ_IRQ,NULL,handle_Keyboard_interrupt );
+	/* Enable interrupt */
+	IOWR(KB_IRQ_BASE,2,15);
+
+	while(1)
+	{
+		audio_play(note_a_jouer);
+	}
+
+	// Tests
+	//test_gen_note(0);
+	//test_play_note(-6);
+
+	return 0;
+}
+
+static void handle_Keyboard_interrupt(void* context, alt_u32 id)
+{
+	int code = (int) IORD(KB_DATA_BASE,0);
+
+	switch(code)
+	{
+	case 21:
+		note_a_jouer = 0;
+		break;
+	case 29:
+		note_a_jouer = 1;
+		break;
+	case 36:
+		note_a_jouer = 2;
+		break;
+	case 45:
+		note_a_jouer = 3;
+		break;
+	case 44:
+		note_a_jouer = 4;
+		break;
+	case 53:
+		note_a_jouer = 5;
+		break;
+	case 60:
+		note_a_jouer = 6;
+		break;
+	case 67:
+		note_a_jouer = 7;
+		break;
+	default:
+		note_a_jouer = -1;
+		break;
+	}
+
+	IOWR(KB_IRQ_BASE,3,15);
+}
+
+void audio_play(int num_note)
+{
+	// joue une période de la note d’indice num_note en transmettant les échantillons vers l’interface de sortie audio
+	if(num_note>=0 && num_note <8)
+	{
+		int i, ech;
+		for(i=0 ; i<gamme[num_note].nbechper;i++)
+		{
+				ech = (int) floor(volume*gamme[num_note].ech[i]);
+				// écriture de l’échantillon de voie gauche
+				while (IORD(AUDIO_DAC_FIFO_0_BASE,0))
+				{
+				}
+				IOWR_16DIRECT(AUDIO_DAC_FIFO_0_BASE,0,ech);
+				// écriture de l’échantillon de voie droite
+				while (IORD(AUDIO_DAC_FIFO_0_BASE,0))
+				{
+				}
+				IOWR_16DIRECT(AUDIO_DAC_FIFO_0_BASE,0,ech);
+		}
+	}
+}
+
+
+void gen_gamme()
+{
+	//génère les NB_NOTES qui seront rangées dans gamme, un tableau de NB_NOTES structures Note
+
+	int i;
+	for( i = 0; i < NB_NOTES; i++)
+	{
+		gamme[i].fsignal = freq_notes[i];
+		gen_note(&gamme[i]);
+	}
+}
+
+void gen_note(struct Note * note)
+{
+	// entrée : pointeur vers une structure Note ; note->fsignal est défini
+	// sortie : calcul des échantillons de la note sur une période ; création d’un tableau (malloc) et rangement des
+	// valeurs dans ce tableau,
+	// mise à jour de note->nbechper et note->ech
+
+	note -> nbechper = round((NB_MOTIF*F_ECH)/note->fsignal);
+	note -> ech = malloc(sizeof(int)*(note->nbechper));
+
+	int j;
+	for(j=0 ; j < note->nbechper; j++)
+	{
+		note->ech[j] = (int) (65234./2)*(1.+sin(j*NB_MOTIF*2*PI/ (note->nbechper) ));
+	}
+}
+
+void test_gen_note(int nb_note)
+{
+	// Test de la bonne génération des notes
+	int i;
+		for(i=0;i<gamme[nb_note].nbechper;i++)
+		{
+			printf("Echantillon note %d, frequence %f, valeur %d \n",nb_note, gamme[nb_note].fsignal, gamme[3].ech[i]);
+		}
+}
+
+void test_play_note(int nb_note)
+{
+	// test la bonne lecture d'une note
+	while(1)
+	{
+		audio_play(nb_note);
+	}
+
+}
+

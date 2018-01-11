@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="pixel_buffer_dma_ctrlr_sim/pixel_buffer_dma_ctrlr.vhd"
+   type="VHDL" />
+ <topLevel name="pixel_buffer_dma_ctrlr" />
+ <deviceFamily name="cycloneivgx" />
+</simPackage>

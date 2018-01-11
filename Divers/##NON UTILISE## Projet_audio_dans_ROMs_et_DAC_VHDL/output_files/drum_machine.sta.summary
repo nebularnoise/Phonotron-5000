@@ -1,0 +1,117 @@
+------------------------------------------------------------
+TimeQuest Timing Analyzer Summary
+------------------------------------------------------------
+
+Type  : Slow Model Setup 'inst6|altpll_component|pll|clk[0]'
+Slack : -12.736
+TNS   : -283.329
+
+Type  : Slow Model Setup 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : -2.903
+TNS   : -1895.239
+
+Type  : Slow Model Setup 'bpm_clock:inst2|internal_bpm_clk_32'
+Slack : -0.450
+TNS   : -0.930
+
+Type  : Slow Model Setup 'CLOCK_50'
+Slack : 2.825
+TNS   : 0.000
+
+Type  : Slow Model Hold 'CLOCK_50'
+Slack : -2.555
+TNS   : -2.555
+
+Type  : Slow Model Hold 'bpm_clock:inst2|internal_bpm_clk_32'
+Slack : 0.391
+TNS   : 0.000
+
+Type  : Slow Model Hold 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : 0.391
+TNS   : 0.000
+
+Type  : Slow Model Hold 'inst6|altpll_component|pll|clk[0]'
+Slack : 0.391
+TNS   : 0.000
+
+Type  : Slow Model Recovery 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : -2.323
+TNS   : -52.622
+
+Type  : Slow Model Removal 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : 1.741
+TNS   : 0.000
+
+Type  : Slow Model Minimum Pulse Width 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : -1.423
+TNS   : -2839.002
+
+Type  : Slow Model Minimum Pulse Width 'bpm_clock:inst2|internal_bpm_clk_32'
+Slack : -0.500
+TNS   : -5.000
+
+Type  : Slow Model Minimum Pulse Width 'CLOCK_50'
+Slack : 9.000
+TNS   : 0.000
+
+Type  : Slow Model Minimum Pulse Width 'inst6|altpll_component|pll|clk[0]'
+Slack : 19.833
+TNS   : 0.000
+
+Type  : Fast Model Setup 'inst6|altpll_component|pll|clk[0]'
+Slack : -6.491
+TNS   : -144.276
+
+Type  : Fast Model Setup 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : -0.979
+TNS   : -472.332
+
+Type  : Fast Model Setup 'bpm_clock:inst2|internal_bpm_clk_32'
+Slack : 0.369
+TNS   : 0.000
+
+Type  : Fast Model Setup 'CLOCK_50'
+Slack : 1.975
+TNS   : 0.000
+
+Type  : Fast Model Hold 'CLOCK_50'
+Slack : -1.595
+TNS   : -1.595
+
+Type  : Fast Model Hold 'bpm_clock:inst2|internal_bpm_clk_32'
+Slack : 0.215
+TNS   : 0.000
+
+Type  : Fast Model Hold 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : 0.215
+TNS   : 0.000
+
+Type  : Fast Model Hold 'inst6|altpll_component|pll|clk[0]'
+Slack : 0.215
+TNS   : 0.000
+
+Type  : Fast Model Recovery 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : -0.592
+TNS   : -11.941
+
+Type  : Fast Model Removal 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : 0.889
+TNS   : 0.000
+
+Type  : Fast Model Minimum Pulse Width 'g00_audio_interface:inst7|pulse_48KHz'
+Slack : -1.423
+TNS   : -2839.002
+
+Type  : Fast Model Minimum Pulse Width 'bpm_clock:inst2|internal_bpm_clk_32'
+Slack : -0.500
+TNS   : -5.000
+
+Type  : Fast Model Minimum Pulse Width 'CLOCK_50'
+Slack : 9.000
+TNS   : 0.000
+
+Type  : Fast Model Minimum Pulse Width 'inst6|altpll_component|pll|clk[0]'
+Slack : 19.833
+TNS   : 0.000
+
+------------------------------------------------------------

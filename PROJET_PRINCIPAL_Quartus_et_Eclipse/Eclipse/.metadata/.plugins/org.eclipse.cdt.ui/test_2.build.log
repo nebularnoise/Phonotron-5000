@@ -1,0 +1,15 @@
+
+**** Build of configuration Nios II for project test_2 ****
+
+make all 
+Info: Building ../test_2_bsp/
+make --no-print-directory -C ../test_2_bsp/
+[BSP build complete]
+Info: Linking test_2.elf
+nios2-elf-g++  -T'../test_2_bsp//linker.x' -msys-crt0='../test_2_bsp//obj/HAL/src/crt0.o' -msys-lib=hal_bsp -L../test_2_bsp/   -Wl,-Map=test_2.map   -O0 -g -Wall   -EL -mno-hw-div -mhw-mul -mno-hw-mulx  -o test_2.elf  -lm 
+../test_2_bsp/\libhal_bsp.a(alt_main.o): In function `alt_main':
+D:\dervieux\Projet_VGA_NIOS\software\test_2_bsp/HAL/src/alt_main.c:154: undefined reference to `main'
+collect2: ld returned 1 exit status
+make: *** [test_2.elf] Error 1
+
+**** Build Finished ****

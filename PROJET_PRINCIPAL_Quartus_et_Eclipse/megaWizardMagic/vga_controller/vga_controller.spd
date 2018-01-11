@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="vga_controller_sim/altera_up_avalon_video_vga_timing.v"
+   type="VERILOG" />
+ <file path="vga_controller_sim/vga_controller.vhd" type="VHDL" />
+ <topLevel name="vga_controller" />
+ <deviceFamily name="cycloneii" />
+</simPackage>
